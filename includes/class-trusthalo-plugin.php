@@ -16,7 +16,7 @@ final class TrustHalo_Plugin {
 	private static $instance = null;
 
 	/**
-	 * Google Places service.
+	 * Google connection service.
 	 *
 	 * @var TrustHalo_Google_Places
 	 */
@@ -45,8 +45,7 @@ final class TrustHalo_Plugin {
 			add_option(
 				TrustHalo_Google_Places::OPTION_NAME,
 				array(
-					'api_key'  => '',
-					'place_id' => '',
+					'connection_status' => 'not_connected',
 				),
 				'',
 				false

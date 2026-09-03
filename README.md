@@ -2,25 +2,22 @@
 
 TrustHalo Reviews is a WordPress plugin by Delta Chip Holdings for displaying Google reviews in a lightweight, responsive slider.
 
-## Phase 2 — Free foundation (0.2.0)
+## Phase 3 — TrustHalo Connect onboarding (0.3.0)
 
-This release provides:
+This release removes the customer-facing Google Places API key, billing, and Place ID setup. It prepares TrustHalo for a simple customer journey:
 
-- one Google business connected with a Places API (New) key and Place ID;
-- server-side requests, so the key is not exposed in front-end markup;
-- live, normalized review data with request-scoped deduplication and no persistent review storage;
-- a `[trusthalo_reviews]` shortcode;
-- a fixed 3/2/1 responsive slider;
-- autoplay, arrows, and pagination enabled by default;
-- a clear admin interface showing which controls are reserved for Pro;
-- WordPress capability, nonce, sanitization, escaping, and uninstall safeguards;
-- current Google Maps attribution, direct review links, author credit, provider credit, and ordering disclosure.
+1. Install TrustHalo Reviews.
+2. Click **Connect Google Business Profile**.
+3. Authorize the Google account that manages the business.
+4. Choose a location and display reviews with `[trusthalo_reviews]`.
 
-Google's Places API selects and limits the review records it returns. TrustHalo Free does not claim to retrieve every Google review.
+The secure TrustHalo Connect service and Google Business Profile API approval are still in progress. The connection button is therefore disabled in this release, and the shortcode only shows a setup notice to WordPress administrators.
+
+TrustHalo does not ask customers to create a Google Cloud project, enable billing, or manage API keys.
 
 ## Free and Pro boundary
 
-Free stays intentionally useful but focused: one location, one slider, one clean style preset, and fixed controls. The planned Pro product will contain multiple locations, additional layouts, complete styling and responsive controls, an Elementor widget, and an owner-connected all-reviews service.
+Free stays intentionally useful but focused: one location, one slider, one clean style preset, and fixed controls. The planned Pro product will contain multiple locations, additional layouts, complete styling and responsive controls, an Elementor widget, and owner-connected review features.
 
 The future Pro code and licence service will live outside this public repository. The intended protection model is domain-bound licensing, signed server verification, an offline grace period, protected updates/support, and graceful fallback to Free features. No client-distributed PHP plugin can be made completely piracy-proof.
 
@@ -28,21 +25,18 @@ The future Pro code and licence service will live outside this public repository
 
 1. Place this repository at `wp-content/plugins/trusthalo-reviews`.
 2. Activate **TrustHalo Reviews** in WordPress.
-3. Configure it at **Settings → TrustHalo Reviews**.
-4. Use `[trusthalo_reviews]` on a page.
+3. Open **Settings → TrustHalo Reviews**.
+4. Add `[trusthalo_reviews]` to a page, post, or shortcode-compatible builder widget.
+5. Confirm that the administrator setup notice appears and visitors see no incomplete slider.
 
 The plugin has no build step or third-party front-end dependency.
 
-Because Google Maps Platform does not currently permit persistent storage of Places review content, TrustHalo requests data when the shortcode renders. Site owners should consider the billing and performance implications when placing the shortcode on high-traffic pages.
-
 ## Security
 
-- Never commit Google API keys or future licensing secrets.
-- Restrict Google API keys where the hosting environment allows.
-- All Google requests run server-side and use a narrow field mask.
-- Administrative refreshes require `manage_options` and a valid nonce.
-- Review content is not persisted between page requests.
-- Sites using the plugin must maintain public Terms of Use and Privacy Policy pages that satisfy Google Maps Platform requirements.
+- The public plugin collects no Google API keys and makes no direct Google API requests.
+- Never commit future TrustHalo Connect or licensing secrets.
+- The future connection will require the business owner's Google authorization.
+- Review presentation and any future service must comply with the applicable Google data and attribution requirements.
 
 ## Licence
 

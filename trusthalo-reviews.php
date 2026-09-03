@@ -3,7 +3,7 @@
  * Plugin Name:       TrustHalo Reviews
  * Plugin URI:        https://github.com/delta-chip-holdings/trusthalo-reviews
  * Description:       Display Google reviews in a fast, responsive review slider.
- * Version:           0.2.0
+ * Version:           0.3.0
  * Requires at least: 6.2
  * Requires PHP:      7.4
  * Author:            Delta Chip Holdings
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'TRUSTHALO_VERSION', '0.2.0' );
+define( 'TRUSTHALO_VERSION', '0.3.0' );
 define( 'TRUSTHALO_FILE', __FILE__ );
 define( 'TRUSTHALO_PATH', plugin_dir_path( __FILE__ ) );
 define( 'TRUSTHALO_URL', plugin_dir_url( __FILE__ ) );

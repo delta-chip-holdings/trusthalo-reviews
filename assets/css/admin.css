@@ -1,0 +1,182 @@
+.trusthalo-admin-wrap {
+	max-width: 1120px;
+}
+
+.trusthalo-admin-heading,
+.trusthalo-card-title-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.trusthalo-admin-heading {
+	margin: 18px 0 20px;
+}
+
+.trusthalo-admin-heading h1,
+.trusthalo-card h2 {
+	margin: 0;
+}
+
+.trusthalo-admin-heading p {
+	margin: 6px 0 0;
+	color: #646970;
+}
+
+.trusthalo-version,
+.trusthalo-plan-badge,
+.trusthalo-lock {
+	display: inline-flex;
+	align-items: center;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: .05em;
+}
+
+.trusthalo-version {
+	padding: 7px 12px;
+	background: #e7f4ee;
+	color: #08764f;
+}
+
+.trusthalo-admin-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 20px;
+}
+
+.trusthalo-card {
+	box-sizing: border-box;
+	padding: 24px;
+	border: 1px solid #dcdcde;
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+}
+
+.trusthalo-card:first-child,
+.trusthalo-layout-card {
+	grid-column: span 2;
+}
+
+.trusthalo-card .form-table {
+	margin-top: 14px;
+}
+
+.trusthalo-refresh-form {
+	display: inline-block;
+	margin-left: 8px;
+}
+
+.trusthalo-card form + .trusthalo-refresh-form {
+	margin-top: -52px;
+	vertical-align: top;
+}
+
+.trusthalo-shortcode {
+	display: block;
+	margin: 16px 0;
+	padding: 14px;
+	border-radius: 7px;
+	background: #f0f0f1;
+	font-size: 14px;
+	user-select: all;
+}
+
+.trusthalo-status {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	margin-top: 22px;
+	padding: 14px 16px;
+	border-left: 4px solid #00a32a;
+	background: #f0f6e9;
+}
+
+.trusthalo-policy-note {
+	margin-top: 22px;
+	padding-top: 14px;
+	border-top: 1px solid #f0f0f1;
+}
+
+.trusthalo-plan-badge {
+	padding: 5px 9px;
+	background: #e7f4ee;
+	color: #08764f;
+}
+
+.trusthalo-plan-badge-pro {
+	background: #f1eafe;
+	color: #6b32c9;
+}
+
+.trusthalo-feature-row {
+	display: grid;
+	grid-template-columns: minmax(180px, 1fr) minmax(220px, 2fr) 54px;
+	align-items: center;
+	gap: 14px;
+	min-height: 48px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.trusthalo-feature-row:last-child {
+	border-bottom: 0;
+}
+
+.trusthalo-feature-row.is-locked {
+	color: #8c8f94;
+}
+
+.trusthalo-feature-label {
+	font-weight: 600;
+}
+
+.trusthalo-lock {
+	justify-content: center;
+	padding: 4px 7px;
+	background: #f1eafe;
+	color: #6b32c9;
+}
+
+.trusthalo-pro-card {
+	background: linear-gradient(145deg, #fff 0%, #f8f4ff 100%);
+}
+
+.trusthalo-pro-card h2 {
+	margin-top: 12px;
+}
+
+.trusthalo-pro-card li {
+	margin-bottom: 9px;
+}
+
+@media (max-width: 782px) {
+	.trusthalo-admin-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.trusthalo-card:first-child,
+	.trusthalo-layout-card {
+		grid-column: auto;
+	}
+
+	.trusthalo-feature-row {
+		grid-template-columns: 1fr auto;
+		padding: 10px 0;
+	}
+
+	.trusthalo-feature-value {
+		grid-column: 1;
+	}
+
+	.trusthalo-lock {
+		grid-column: 2;
+		grid-row: 1 / span 2;
+	}
+
+	.trusthalo-card form + .trusthalo-refresh-form {
+		margin: 0;
+	}
+}

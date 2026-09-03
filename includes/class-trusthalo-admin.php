@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 
 class TrustHalo_Admin {
 	/**
-	 * Google Places service.
+	 * Connection service.
 	 *
 	 * @var TrustHalo_Google_Places
 	 */
@@ -18,19 +18,17 @@ class TrustHalo_Admin {
 	/**
 	 * Constructor.
 	 *
-	 * @param TrustHalo_Google_Places $google_places Google Places service.
+	 * @param TrustHalo_Google_Places $google_places Connection service.
 	 */
 	public function __construct( TrustHalo_Google_Places $google_places ) {
 		$this->google_places = $google_places;
 
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
-		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
-		add_action( 'admin_post_trusthalo_refresh_reviews', array( $this, 'refresh_reviews' ) );
 	}
 
 	/**
-	 * Register the settings page.
+	 * Register settings page.
 	 *
 	 * @return void
 	 */
@@ -45,26 +43,6 @@ class TrustHalo_Admin {
 	}
 
 	/**
-	 * Register one compact settings option.
-	 *
-	 * @return void
-	 */
-	public function register_settings() {
-		register_setting(
-			'trusthalo_reviews',
-			TrustHalo_Google_Places::OPTION_NAME,
-			array(
-				'type'              => 'array',
-				'sanitize_callback' => array( $this, 'sanitize_settings' ),
-				'default'           => array(
-					'api_key'  => '',
-					'place_id' => '',
-				),
-			)
-		);
-	}
-
-	/**
 	 * Load settings-only styles.
 	 *
 	 * @param string $hook_suffix Current admin page hook.
@@ -75,68 +53,11 @@ class TrustHalo_Admin {
 			return;
 		}
 
-		wp_enqueue_style(
-			'trusthalo-admin',
-			TRUSTHALO_URL . 'assets/css/admin.css',
-			array(),
-			TRUSTHALO_VERSION
-		);
+		wp_enqueue_style( 'trusthalo-admin', TRUSTHALO_URL . 'assets/css/admin.css', array(), TRUSTHALO_VERSION );
 	}
 
 	/**
-	 * Sanitize saved credentials.
-	 *
-	 * @param mixed $input Submitted settings.
-	 * @return array
-	 */
-	public function sanitize_settings( $input ) {
-		$old   = $this->google_places->get_settings();
-		$input = is_array( $input ) ? $input : array();
-		$key   = isset( $input['api_key'] ) ? sanitize_text_field( wp_unslash( $input['api_key'] ) ) : '';
-		$place = isset( $input['place_id'] ) ? sanitize_text_field( wp_unslash( $input['place_id'] ) ) : '';
-
-		$new = array(
-			'api_key'  => '' !== $key ? $key : $old['api_key'],
-			'place_id' => trim( $place ),
-		);
-
-		return $new;
-	}
-
-	/**
-	 * Test the server-side API connection.
-	 *
-	 * @return void
-	 */
-	public function refresh_reviews() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to manage TrustHalo.', 'trusthalo-reviews' ) );
-		}
-
-		check_admin_referer( 'trusthalo_refresh_reviews' );
-
-		$result = $this->google_places->get_reviews( true );
-		$args   = array( 'page' => 'trusthalo-reviews' );
-
-		if ( is_wp_error( $result ) ) {
-			$args['trusthalo_status'] = 'error';
-			$args['trusthalo_message'] = $result->get_error_message();
-		} else {
-			$args['trusthalo_status'] = 'success';
-			$args['trusthalo_message'] = sprintf(
-				/* translators: 1: business name, 2: number of reviews returned by Google. */
-				__( 'Connected to %1$s. Google returned %2$d review(s).', 'trusthalo-reviews' ),
-				$result['business_name'],
-				count( $result['reviews'] )
-			);
-		}
-
-		wp_safe_redirect( add_query_arg( $args, admin_url( 'options-general.php' ) ) );
-		exit;
-	}
-
-	/**
-	 * Render the complete Free settings experience and visible Pro locks.
+	 * Render the customer-friendly connection and Free/Pro settings experience.
 	 *
 	 * @return void
 	 */
@@ -144,10 +65,6 @@ class TrustHalo_Admin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-
-		$settings = $this->google_places->get_settings();
-		$status   = isset( $_GET['trusthalo_status'] ) ? sanitize_key( wp_unslash( $_GET['trusthalo_status'] ) ) : '';
-		$message  = isset( $_GET['trusthalo_message'] ) ? sanitize_text_field( wp_unslash( $_GET['trusthalo_message'] ) ) : '';
 		?>
 		<div class="wrap trusthalo-admin-wrap">
 			<div class="trusthalo-admin-heading">
@@ -158,49 +75,20 @@ class TrustHalo_Admin {
 				<span class="trusthalo-version"><?php echo esc_html( 'Free ' . TRUSTHALO_VERSION ); ?></span>
 			</div>
 
-			<?php if ( $message ) : ?>
-				<div class="notice notice-<?php echo 'success' === $status ? 'success' : 'error'; ?> is-dismissible"><p><?php echo esc_html( $message ); ?></p></div>
-			<?php endif; ?>
-
 			<div class="trusthalo-admin-grid">
 				<div class="trusthalo-card">
-					<h2><?php esc_html_e( 'Connect one Google business', 'trusthalo-reviews' ); ?></h2>
-					<p class="description"><?php esc_html_e( 'The API key is used only by your WordPress server and is never printed in the slider markup.', 'trusthalo-reviews' ); ?></p>
-
-					<form action="options.php" method="post">
-						<?php settings_fields( 'trusthalo_reviews' ); ?>
-						<table class="form-table" role="presentation">
-							<tr>
-								<th scope="row"><label for="trusthalo-api-key"><?php esc_html_e( 'Places API key', 'trusthalo-reviews' ); ?></label></th>
-								<td>
-									<input id="trusthalo-api-key" class="regular-text" type="password" name="trusthalo_settings[api_key]" value="" autocomplete="new-password" placeholder="<?php echo $settings['api_key'] ? esc_attr__( 'Configured — leave blank to keep it', 'trusthalo-reviews' ) : ''; ?>">
-									<p class="description"><?php esc_html_e( 'Enable Places API (New), enable billing, and restrict the key where practical.', 'trusthalo-reviews' ); ?></p>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row"><label for="trusthalo-place-id"><?php esc_html_e( 'Google Place ID', 'trusthalo-reviews' ); ?></label></th>
-								<td><input id="trusthalo-place-id" class="regular-text" type="text" name="trusthalo_settings[place_id]" value="<?php echo esc_attr( $settings['place_id'] ); ?>" required></td>
-							</tr>
-						</table>
-						<?php submit_button( __( 'Save connection', 'trusthalo-reviews' ) ); ?>
-					</form>
-
-					<?php if ( $settings['api_key'] && $settings['place_id'] ) : ?>
-						<form class="trusthalo-refresh-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
-							<input type="hidden" name="action" value="trusthalo_refresh_reviews">
-							<?php wp_nonce_field( 'trusthalo_refresh_reviews' ); ?>
-							<?php submit_button( __( 'Test Google connection', 'trusthalo-reviews' ), 'secondary', 'submit', false ); ?>
-						</form>
-					<?php endif; ?>
-
-					<p class="description trusthalo-policy-note"><?php esc_html_e( 'Google Maps content is fetched live and is not stored between page requests. Your website must also provide public Terms of Use and a Privacy Policy that meet Google Maps Platform requirements.', 'trusthalo-reviews' ); ?></p>
+					<h2><?php esc_html_e( 'Connect Google', 'trusthalo-reviews' ); ?></h2>
+					<p><?php esc_html_e( 'TrustHalo will connect to the Google account that manages your Business Profile. You will not need a Google API key, a Place ID, or your own Google Cloud billing account.', 'trusthalo-reviews' ); ?></p>
+					<p class="description"><strong><?php esc_html_e( 'Coming soon:', 'trusthalo-reviews' ); ?></strong> <?php esc_html_e( 'TrustHalo Connect is being prepared while Google Business Profile API access is approved. The button will be enabled when the secure connection service is live.', 'trusthalo-reviews' ); ?></p>
+					<button class="button button-primary" type="button" disabled aria-disabled="true"><?php esc_html_e( 'Connect Google Business Profile', 'trusthalo-reviews' ); ?></button>
+					<p class="description trusthalo-policy-note"><?php esc_html_e( 'Do not add a Google API key or billing account for TrustHalo. The connection will be handled by TrustHalo Connect after launch.', 'trusthalo-reviews' ); ?></p>
 				</div>
 
 				<div class="trusthalo-card">
 					<h2><?php esc_html_e( 'Display', 'trusthalo-reviews' ); ?></h2>
-					<p><?php esc_html_e( 'Paste this shortcode into any page, post, or compatible builder:', 'trusthalo-reviews' ); ?></p>
+					<p><?php esc_html_e( 'Your shortcode is ready. It will show reviews after Google is connected:', 'trusthalo-reviews' ); ?></p>
 					<code class="trusthalo-shortcode">[trusthalo_reviews]</code>
-					<p class="description"><?php esc_html_e( 'The connection runs server-side when the shortcode is displayed. Review content is not stored by TrustHalo.', 'trusthalo-reviews' ); ?></p>
+					<p class="description"><?php esc_html_e( 'No review content is shown until TrustHalo Connect is live and the business owner authorizes the connection.', 'trusthalo-reviews' ); ?></p>
 				</div>
 
 				<div class="trusthalo-card trusthalo-layout-card">
